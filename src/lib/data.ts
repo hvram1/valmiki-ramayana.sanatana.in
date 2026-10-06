@@ -9,6 +9,7 @@ export interface Verse {
   cid: string;
   text: string;
   toks: Tok[];
+  u: number; // leading tokens that are the speaker line (uvacha), 0 if none
   t: number;
   e: number;
   score: number;

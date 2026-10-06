@@ -68,6 +68,8 @@ main { max-width: 52rem; margin: 0 auto; padding: 0 16px; }
 .verse:target { box-shadow: inset 3px 0 0 var(--accent); }
 .vtext { font-size: 1.3rem; line-height: 1.9; margin: 0; }
 .half { display: block; }
+.uvacha { display: block; font-size: 0.85em; color: var(--muted); }
+.uvacha .w.on { color: var(--ink); }
 .w { cursor: pointer; border-radius: 4px; padding: 0 1px; transition: background 0.08s; }
 .w:hover { background: var(--accent-soft); }
 .w.on { background: var(--lit); }

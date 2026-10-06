@@ -1,8 +1,8 @@
 ---
-// The content address. One place: that verse, canonical to its readable
-// address. Several (the same text twice): a list of the places.
+// The content address. One place: a small page that forwards to the
+// readable address (canonical there), so the verse is built once. Several
+// places (the same text twice): a list of them.
 import Base from '../../layouts/Base.astro';
-import VersePage from '../../components/VersePage.astro';
 import { CIDS, sarga } from '../../lib/data';
 import { verseHref } from '../../lib/site';
 
@@ -13,9 +13,21 @@ const { cid } = Astro.params as { cid: string };
 const places = CIDS[cid];
 const [k, s, v] = places[0];
 const text = sarga(k, s).verses.find((x) => x.n === v)!.text;
+const target = verseHref(k, s, v);
+const canon = new URL(target, Astro.site).href;
 ---
 {places.length === 1 ? (
-  <VersePage k={k} s={s} v={v} canonical={verseHref(k, s, v)} />
+  <html lang="sa">
+    <head>
+      <meta charset="utf-8" />
+      <title>{k}.{s}.{v}</title>
+      <link rel="canonical" href={canon} />
+      <meta name="robots" content="noindex" />
+      <meta http-equiv="refresh" content={`0; url=${target}`} />
+      <script is:inline define:vars={{ target }}>location.replace(target + location.hash);</script>
+    </head>
+    <body><a href={target}>{k}.{s}.{v}</a> {text}</body>
+  </html>
 ) : (
   <Base title={`#${cid}`}>
     <h1><code>#{cid}</code></h1>

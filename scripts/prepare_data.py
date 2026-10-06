@@ -68,11 +68,17 @@ def load_text(xml_dir, k):
         verses = []
         for sh in sarga.findall('shloka'):
             sid = sh.get('shl_id')
-            text = sh.find('shloka_text').text.strip()
+            st = sh.find('shloka_text')
+            # A speaker line (<uvacha>तम् उवाच</uvacha>) opens 33 verses. It is
+            # chanted, so it is shown and lit, but it is not the verse:
+            # shloka_setu keeps uvacha apart, and the content id leaves it out.
+            uv = st.find('uvacha')
+            uvacha = ' '.join(uv.text.split()) if uv is not None else None
+            text = ' '.join(''.join(st.itertext()).split())
             m = re.search(r'॥\s*([०-९0-9]+)\s*॥\s*$', text)
             body = text[:m.start()].strip() if m else text
             verses.append({'sid': sid, 'n': int(sid.split('_V')[1]),
-                           'text': body})
+                           'text': body, 'uvacha': uvacha})
         col = sarga.find('colophon')
         sargas.append({'s': s, 'name': sarga.get('name'), 'verses': verses,
                        'colophon': (col.text or '').strip() if col is not None else None})
@@ -143,10 +149,15 @@ def main():
                 if n_tied != n_aligned:
                     problems.append('%s: %d of %d words tied to the text'
                                     % (v['sid'], n_tied, n_aligned))
-                cid = content_id(v['text'])
+                verse_only = v['text']
+                if v['uvacha']:
+                    assert verse_only.startswith(v['uvacha']), v['sid']
+                    verse_only = verse_only[len(v['uvacha']):].strip()
+                cid = content_id(verse_only)
                 cids.setdefault(cid, []).append([k, s, v['n']])
                 roman = ' '.join(words[t[1]]['r'] for t in toks if t[1] is not None)
                 verses.append({'n': v['n'], 'cid': cid, 'text': v['text'], 'toks': toks,
+                               'u': len(v['uvacha'].split()) if v['uvacha'] else 0,
                                't': u['t'], 'e': u['e'], 'score': u['score']})
                 search.append([k, s, v['n'], v['text'], roman])
 

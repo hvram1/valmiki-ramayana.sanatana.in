@@ -8,7 +8,7 @@ const conf = { files: KANDAS.map((K) => href(`search/k${K.k}.json`)), base: href
   <h1>अन्वेषणम् <small>Search</small></h1>
   <form class="search" role="search" onsubmit="return false">
     <input id="q" type="search" autocomplete="off" autofocus
-      placeholder="रामो नाम जनैः श्रुतः · ramo nama janaih shrutah · rāmo nāma" aria-label="Search the verses" />
+      placeholder="रामो विग्रहवान् धर्मः · ramo vigrahavan · rāmo vigrahavān" aria-label="Search the verses" />
   </form>
   <p class="hint" id="status">Type in Devanagari or in Roman letters, with or without diacritics.</p>
   <ol class="results" id="results"></ol>
@@ -39,16 +39,23 @@ const conf = { files: KANDAS.map((K) => href(`search/k${K.k}.json`)), base: href
   const devaFold = (s: string) => s.replace(/[\s|।॥ऽ\-]/g, '');
   const isDeva = (s: string) => /[ऀ-ॿ]/.test(s);
 
-  let rows: (Row & { f?: string; d?: string })[] = [];
   let index: { row: Row; f: string; d: string }[] = [];
+  let loaded = 0;
+  const p = new URLSearchParams(location.search).get('q');
+  if (p) q.value = p;
 
-  Promise.all(conf.files.map((f: string) => fetch(f).then((r) => r.json()))).then((parts) => {
-    rows = parts.flat();
-    index = rows.map((row) => ({ row, f: fold(row[4]), d: devaFold(row[3]) }));
-    status.textContent = `${index.length.toLocaleString('en-IN')} verses. Type in Devanagari or in Roman letters, with or without diacritics.`;
-    const p = new URLSearchParams(location.search).get('q');
-    if (p) { q.value = p; run(); }
-  });
+  // Each kāṇḍa is searchable as soon as it arrives.
+  conf.files.forEach((f: string) =>
+    fetch(f).then((r) => r.json()).then((rows: Row[]) => {
+      index = index.concat(rows.map((row) => ({ row, f: fold(row[4]), d: devaFold(row[3]) })));
+      index.sort((a, b) => a.row[0] - b.row[0] || a.row[1] - b.row[1] || a.row[2] - b.row[2]);
+      loaded++;
+      if (q.value.trim()) run();
+      else status.textContent = loaded < conf.files.length
+        ? `Loading… ${index.length.toLocaleString('en-IN')} verses so far`
+        : `${index.length.toLocaleString('en-IN')} verses. Type in Devanagari or in Roman letters, with or without diacritics.`;
+    })
+  );
 
   const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
 
@@ -64,7 +71,8 @@ const conf = { files: KANDAS.map((K) => href(`search/k${K.k}.json`)), base: href
     if (!deva && needle.length > 3) needle = needle.replace(/a$/, '');
     if (needle.length < 2) return;
     const hits = index.filter((x) => (deva ? x.d : x.f).includes(needle));
-    status.textContent = hits.length ? `${hits.length} verse${hits.length > 1 ? 's' : ''}${hits.length > 200 ? ', the first 200 shown' : ''}` : 'Nothing found';
+    const more = loaded < conf.files.length ? ' (still loading)' : '';
+    status.textContent = (hits.length ? `${hits.length} verse${hits.length > 1 ? 's' : ''}${hits.length > 200 ? ', the first 200 shown' : ''}` : 'Nothing found') + more;
     results.innerHTML = hits.slice(0, 200).map(({ row: [k, s, v, text] }) =>
       `<li><a href="${conf.base}${k}/${s}/${v}/"><span class="vnum">${k}.${s}.${v}</span> <span class="rtext">${esc(text).replace(/ \| /g, ' । ')}</span></a></li>`
     ).join('');

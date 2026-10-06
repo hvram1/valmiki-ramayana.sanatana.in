@@ -11,8 +11,9 @@ interface Props {
 const { k, s, verse, link = true } = Astro.props;
 
 // Halves split at '|'; each token is a word lit by the player, or plain text.
+const uvacha = verse.toks.slice(0, verse.u ?? 0);
 const halves: Verse['toks'][] = [[]];
-for (const t of verse.toks) {
+for (const t of verse.toks.slice(verse.u ?? 0)) {
   if (t[0] === '|' || t[0] === '।') halves.push([]);
   else halves[halves.length - 1].push(t);
 }
@@ -20,6 +21,11 @@ const uncertain = verse.score < 0.4;
 ---
 <article class="verse" id={`v${verse.n}`} data-n={verse.n} data-t={verse.t} data-e={verse.e}>
   <p class="vtext">
+    {uvacha.length > 0 && (
+      <span class="uvacha">
+        {uvacha.map((t) => t[1] === null ? <span class="mark">{t[0]} </span> : <><span class="w" data-w={t[1]}>{t[0]}</span>{' '}</>)}
+      </span>
+    )}
     {halves.map((h, i) => (
       <span class="half">
         {h.map((t) =>

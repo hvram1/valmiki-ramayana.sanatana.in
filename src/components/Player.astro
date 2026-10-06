@@ -7,12 +7,19 @@ interface Props {
   stopAtVerseEnd?: boolean; // a verse page plays one verse and stops
 }
 const { sarga, verses, stopAtVerseEnd = false } = Astro.props;
+// Only the words this page shows: a verse page carries its own, not the
+// sarga's. w0 is the index of the first, as the spans' data-w count from 0
+// for the whole sarga.
+const ids = verses.flatMap((v) => v.toks.map((t) => t[1]).filter((i): i is number => i !== null));
+const w0 = ids.length ? Math.min(...ids) : 0;
+const w1 = ids.length ? Math.max(...ids) + 1 : 0;
 const data = {
   k: sarga.k,
   s: sarga.s,
   audio: sarga.audio,
   duration: sarga.duration,
-  words: sarga.words,
+  w0,
+  words: sarga.words.slice(w0, w1),
   verses: verses.map((v) => [v.n, v.t, v.e]),
   stopAtVerseEnd,
 };
@@ -38,7 +45,7 @@ const data = {
 
 <script>
   type Data = {
-    k: number; s: number; audio: string | null; duration: number;
+    k: number; s: number; audio: string | null; duration: number; w0: number;
     words: [number, number][]; verses: [number, number, number][]; stopAtVerseEnd: boolean;
   };
   const data: Data = JSON.parse(document.getElementById('player-data')!.textContent!);
@@ -58,7 +65,7 @@ const data = {
 
   // Word spans by index into data.words; only those on this page exist.
   const spans = new Map<number, HTMLElement>();
-  document.querySelectorAll<HTMLElement>('.w[data-w]').forEach((el) => spans.set(+el.dataset.w!, el));
+  document.querySelectorAll<HTMLElement>('.w[data-w]').forEach((el) => spans.set(+el.dataset.w! - data.w0, el));
   const articles = new Map<number, HTMLElement>();
   document.querySelectorAll<HTMLElement>('article.verse').forEach((el) => articles.set(+el.dataset.n!, el));
   const starts = data.words.map((w) => w[0]);
@@ -183,7 +190,7 @@ const data = {
   document.addEventListener('click', (ev) => {
     const w = (ev.target as HTMLElement).closest<HTMLElement>('.w[data-w]');
     if (!w || !getSelection()?.isCollapsed) return;
-    playFrom(data.words[+w.dataset.w!][0], data.stopAtVerseEnd ? data.verses[0][2] : null);
+    playFrom(data.words[+w.dataset.w! - data.w0][0], data.stopAtVerseEnd ? data.verses[0][2] : null);
   });
 
   addEventListener('keydown', (ev) => {
