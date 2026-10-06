@@ -34,12 +34,10 @@ PUNCT = re.compile(r'^[|।॥0-9०-९,\-–—]+$')
 
 
 def content_id(text):
-    """shloka_setu's verse id. Its strict key strips '।' but not an ASCII
-    '|', which this edition uses between the halves; fold it first so the id
-    agrees with an edition that writes the danda."""
+    """shloka_setu's verse id."""
     from shloka_setu.translit import keys
     from shloka_setu.index import unit_id
-    strict, _ = keys(text.replace('|', '।'))
+    strict, _ = keys(text)
     return unit_id('V', strict)
 
 
@@ -171,7 +169,8 @@ def main():
             json.dump(search, f, ensure_ascii=False, separators=(',', ':'))
         print('K%d %s: %d sargas, %d verses' % (k, kname, len(listing), len(search)))
 
-    cids = {c: ps for c, ps in cids.items() if ps}
+    # in reading order, so a rerun writes the same file
+    cids = dict(sorted(((c, sorted(ps)) for c, ps in cids.items() if ps), key=lambda kv: kv[1][0]))
     json.dump(dict(sorted(kandas.items(), key=lambda kv: int(kv[0]))),
               open(kandas_path, 'w'), ensure_ascii=False, indent=1)
     json.dump(cids, open(cid_path, 'w'), separators=(',', ':'))
