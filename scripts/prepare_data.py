@@ -52,18 +52,27 @@ def numeral(s):
     return int(s.translate(str.maketrans('०१२३४५६७८९', '0123456789')))
 
 
-def tokens(text, words, first):
-    """Split a verse into display tokens, each tied to the aligned word it
-    is (index into the sarga's word list) or None for punctuation and the
-    edition's marks ('-', 'यद्वा' dashes, '4,5'). Returns (tokens, unmatched)."""
-    out, j = [], first
-    for tok in text.split():
-        if j < len(words) and tok == words[j]['w']:
-            out.append([tok, j])
-            j += 1
-        else:
-            out.append([tok, None])
-    return out, j
+def tokens(text, words, first, n):
+    """Split a verse into display tokens, each tied to the aligned word it is
+    (an index into the sarga's word list) or None for punctuation and the
+    edition's marks. The alignment was made from the text as it was then, so a
+    word mended since (कृत्वा, aligned as क्ऱ्त्वा) is tied by its place in the
+    sequence: equal runs match, and a changed run of the same length pairs off
+    one to one; aligned words the text no longer has (an editor's "Or",
+    a [variant]) are left out."""
+    import difflib
+    toks = text.split()
+    spoken = [i for i, t in enumerate(toks) if not PUNCT.match(t)]
+    aligned = [w['w'] for w in words[first:first + n]]
+    tie = {}
+    sm = difflib.SequenceMatcher(None, [toks[i] for i in spoken], aligned, autojunk=False)
+    for op, a0, a1, b0, b1 in sm.get_opcodes():
+        if op in ('equal', 'replace'):
+            # a run that shrank (two fragments mended into one word) ties each
+            # word to the first aligned word at its place
+            for d in range(a1 - a0):
+                tie[spoken[a0 + d]] = first + b0 + min(d, b1 - b0 - 1)
+    return [[t, tie.get(i)] for i, t in enumerate(toks)], None
 
 
 def load_text(xml_dir, k):
@@ -165,12 +174,11 @@ def main():
                     problems.append('%s: not in the alignment' % v['sid'])
                     continue
                 first = next((i for i, w in enumerate(words) if w['unit'] == u['i']), len(words))
-                toks, _ = tokens(v['text'], words, first)
                 n_aligned = sum(1 for w in words if w['unit'] == u['i'])
-                n_tied = sum(1 for t in toks if t[1] is not None)
-                if n_tied != n_aligned:
-                    problems.append('%s: %d of %d words tied to the text'
-                                    % (v['sid'], n_tied, n_aligned))
+                toks, _ = tokens(v['text'], words, first, n_aligned)
+                loose = [t[0] for t in toks if t[1] is None and not PUNCT.match(t[0])]
+                if loose:
+                    problems.append('%s: no timing for %s' % (v['sid'], ' '.join(loose)))
                 verse_only = v['text']
                 if v['uvacha']:
                     assert verse_only.startswith(v['uvacha']), v['sid']
