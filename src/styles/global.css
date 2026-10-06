@@ -85,6 +85,7 @@ main.wide { max-width: 72rem; }
 .mangala { font-family: var(--deva); color: var(--saffron); font-size: clamp(1.25rem, 3.2vw, 1.9rem); line-height: 1.55; margin: 0 0 22px; text-wrap: balance; }
 .hero-art { margin: 0 auto; max-width: 100%; }
 .hero-art img { display: block; width: 100%; height: auto; max-height: 34rem; object-fit: contain; }
+.emblem { display: block; }
 figcaption { font-size: 0.8rem; color: var(--muted); font-style: italic; margin-top: 6px; }
 
 /* portal: intro */
@@ -227,3 +228,15 @@ em.term, em.name { color: var(--saffron); }
 .tilaka-inline[open] { padding-bottom: 4px; }
 
 .credits li { margin-bottom: 8px; }
+
+/* the demo's switch between picture sets */
+.art-switch { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 8px; margin: 14px auto 0; padding: 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); font-size: 0.95rem; }
+.art-switch-label { color: var(--muted); padding: 0 6px 0 10px; font-style: italic; }
+.art-switch button { font: inherit; font-size: 0.95rem; border: none; border-radius: 999px; padding: 5px 14px; background: transparent; color: var(--ink); cursor: pointer; }
+.art-switch button:hover { background: var(--cream); }
+.art-switch button[aria-pressed="true"] { background: var(--saffron); color: var(--paper); }
+.art-switch-src { font-size: 0.8em; opacity: 0.75; margin-left: 4px; }
+.feature-icon { display: block; width: 96px; height: 96px; }
+.credit-set { margin: 28px 0; }
+.credit-set h2 { font-weight: 400; color: var(--maroon); font-size: 1.5rem; margin: 0 0 6px; }
+@media (max-width: 560px) { .art-switch-src { display: none; } .art-switch { font-size: 0.9rem; } }

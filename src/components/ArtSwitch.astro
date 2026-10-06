@@ -1,0 +1,28 @@
+---
+// The demo's switch between illustration sets. The choice is kept in the
+// visitor's browser and applies on every page (the emblem, the credits).
+import { ART_SETS, ART_NAMES } from '../lib/site';
+---
+<div class="art-switch" role="group" aria-label="Choose the pictures">
+  <span class="art-switch-label">Pictures</span>
+  {ART_NAMES.map((n) => (
+    <button type="button" data-art-choose={n} aria-pressed="false">
+      {ART_SETS[n].label} <span class="art-switch-src">{ART_SETS[n].source}</span>
+    </button>
+  ))}
+</div>
+<script>
+  const root = document.documentElement;
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-art-choose]')];
+  const current = () =>
+    root.dataset.art || getComputedStyle(root).getPropertyValue('--art-default').trim().replace(/"/g, '');
+  const show = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.artChoose === current())));
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      root.dataset.art = b.dataset.artChoose!;
+      try { localStorage.setItem('ramayana-art', b.dataset.artChoose!); } catch {}
+      show();
+    })
+  );
+  show();
+</script>

@@ -1,0 +1,23 @@
+---
+// One image slot, rendered once per illustration set; CSS shows the chosen
+// set's copy. Every copy is lazy, so a hidden one is never downloaded.
+import { ART_SETS, ART_NAMES, artUrl, type ArtSet } from '../lib/site';
+
+type Img = string | { src: string; w: number; h: number } | undefined;
+interface Props {
+  pick: (s: ArtSet) => Img;
+  alt?: (s: ArtSet) => string | undefined;
+  width?: number;
+  height?: number;
+  class?: string;
+}
+const { pick, alt = () => '', width, height, class: cls } = Astro.props;
+const copies = ART_NAMES.map((n) => ({ n, img: pick(ART_SETS[n]), alt: alt(ART_SETS[n]) ?? '' }))
+  .filter((c) => c.img);
+---
+{copies.map(({ n, img, alt }) => {
+  const src = typeof img === 'string' ? img : img!.src;
+  const w = typeof img === 'string' ? width : img!.w;
+  const h = typeof img === 'string' ? height : img!.h;
+  return <img class:list={['art', `art-${n}`, cls]} src={artUrl(n, src)} alt={alt} width={w} height={h} loading="lazy" decoding="async" />;
+})}

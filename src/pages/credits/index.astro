@@ -1,22 +1,36 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { SITE, href, ART } from '../../lib/site';
-const C = ART.credits as Record<string, { title: string; artist: string; license: string; source: string }>;
-const where: Record<string, string> = { banner: 'Banner', intro: 'Introduction' };
+import { SITE, href, ART_SETS, ART_NAMES } from '../../lib/site';
+type Credit = { title: string; artist: string; license: string; source: string };
+const creditsOf = (n: (typeof ART_NAMES)[number]) => Object.entries(ART_SETS[n].credits as Record<string, Credit>);
+const where = (slot: string) => ({ banner: 'Banner', intro: 'Introduction' } as Record<string, string>)[slot] ?? `Kāṇḍa ${slot.replace('kanda-', '')}`;
+const about: Record<string, string> = {
+  commons: 'The paintings are in the public domain or released under CC0, and come from Wikimedia Commons. The holding museum and the full licence statement are on each painting’s Commons page.',
+  generated: 'The illustrations are placeholders generated with Gemini, to be replaced by a commissioned artist.',
+};
 ---
 <Base title="Credits">
   <h1>Credits</h1>
-  {ART.name === 'commons'
-    ? <p>The paintings on this site are in the public domain or released under CC0, and come from Wikimedia Commons. The holding museum and the full licence statement are on each painting’s Commons page.</p>
-    : <p>The illustrations on this site are placeholders generated with Gemini, to be replaced by a commissioned artist.</p>}
-  <ul class="credits">
-    {Object.entries(C).map(([slot, c]) => (
-      <li>
-        <strong>{where[slot] ?? `Kāṇḍa ${slot.replace('kanda-', '')}`}</strong>:
-        {c.source ? <a href={c.source}>{c.title}</a> : c.title}. {c.artist}.{c.license && ` ${c.license}.`}
-      </li>
-    ))}
-  </ul>
+  <p>The site has two sets of pictures; the switch on the <a href={href()}>home page</a> chooses between them. The credits for the set you are seeing come first.</p>
+  {ART_NAMES.map((n) => (
+    <section class="credit-set">
+      <h2>{ART_SETS[n].label} <small>{ART_SETS[n].source}</small></h2>
+      <p>{about[n]}</p>
+      <ul class="credits">
+        {creditsOf(n).map(([slot, c]) => (
+          <li><strong>{where(slot)}</strong>: {c.source ? <a href={c.source}>{c.title}</a> : c.title}. {c.artist}.{c.license && ` ${c.license}.`}</li>
+        ))}
+      </ul>
+    </section>
+  ))}
+  <h2>Text, recitation, fonts</h2>
   <p>The Sanskrit text is from <a href="https://www.valmikiramayan.net/">valmikiramayan.net</a>. The recitation by {SITE.reciter} is on <a href={SITE.recording}>archive.org</a>. The fonts are Siddhanta, EB Garamond and Noto Serif Devanagari.</p>
-  <p><a href={href()}>‹ मुखपृष्ठम्</a></p>
 </Base>
+
+<script>
+  // the set being shown first
+  const chosen = document.documentElement.dataset.art;
+  const sets = [...document.querySelectorAll<HTMLElement>('.credit-set')];
+  const i = sets.findIndex((s) => s.querySelector('h2')?.textContent?.includes(chosen === 'generated' ? 'Illustrations' : 'Paintings'));
+  if (i > 0) sets[0].before(sets[i]);
+</script>

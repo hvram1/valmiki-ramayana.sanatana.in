@@ -9,10 +9,12 @@
   "reciter": "Sriram Harisitaramamurti Ghanapāṭhī",
   "recording": "https://archive.org/details/Ramayana-recitation-Sriram-harisItArAmamUrti-Ghanapaati-v2",
   "art": {
-    "_note": "set picks the illustrations: 'commons' (public-domain paintings) or 'generated' (Gemini placeholders). ART_SET in the environment overrides it for one build. Paths are under public/images/art/<set>/.",
+    "_note": "Both sets are published; visitors switch between them with the control on the home page, and the choice is remembered in their browser. set is what a first visit shows; ART_SET in the environment overrides it for one build. Paths are under public/images/art/<set>/.",
     "set": "commons",
     "sets": {
       "commons": {
+        "label": "Paintings",
+        "source": "Wikimedia Commons",
         "emblem": "emblem.svg",
         "banner": {
           "src": "banner.jpg",
@@ -92,6 +94,8 @@
         }
       },
       "generated": {
+        "label": "Illustrations",
+        "source": "Gemini placeholders",
         "emblem": "emblem.png",
         "banner": {
           "src": "banner.jpg",

@@ -1,0 +1,8 @@
+---
+// Text that belongs to an illustration set (a caption, a credit line):
+// one span per set, shown with that set.
+import { ART_SETS, ART_NAMES, type ArtSet } from '../lib/site';
+interface Props { text: (s: ArtSet) => string | undefined }
+const { text } = Astro.props;
+---
+{ART_NAMES.map((n) => { const t = text(ART_SETS[n]); return t ? <span class:list={['art', `art-${n}`]}>{t}</span> : null; })}

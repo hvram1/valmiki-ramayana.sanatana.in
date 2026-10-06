@@ -50,15 +50,19 @@ seeks within it by the aligned times.
 
 ## Illustrations: two sets, one switch
 
-`art.set` in `site.config.json` chooses the illustrations, and `ART_SET` in the
-environment overrides it for one build:
+Both sets are published. A switch under the banner on the home page
+("Pictures: Paintings | Illustrations") lets a visitor flip between them; the
+choice is kept in their browser and applies on every page (the emblem, the
+credits). `art.set` in `site.config.json` is what a first visit shows, and
+`ART_SET` overrides it for one build:
 
-    ART_SET=generated npm run build     # Gemini placeholders
-    ART_SET=commons npm run build       # public-domain paintings (default)
+    ART_SET=generated npm run build     # first visit shows the Gemini placeholders
 
 Each set lives in `public/images/art/<set>/` (banner, introduction, emblem,
-six kāṇḍa cards, six feature icons) and has its own entries and credits under
-`art.sets` in the config; the credits page follows the set.
+six kāṇḍa cards, six feature icons) with its own label, credits and file names
+under `art.sets` in the config. Every image slot is rendered once per set and
+CSS shows the chosen one; the copies are lazy, so the hidden set is never
+downloaded unless the visitor switches to it.
 
 - **commons**: paintings from Wikimedia Commons, public domain or CC0, chosen
   from the gallery at https://claude.ai/artifact/1RkYLLpdQ6QT2ERjpmYrR4.
