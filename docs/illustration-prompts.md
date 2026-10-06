@@ -1,5 +1,28 @@
 # Illustration prompts
 
+The prompts now live in `scripts/generate_art.py`, which sends them to Gemini
+and installs the chosen results; see the README, "Illustrations: two sets, one
+switch". What changed after the first trial, and why:
+
+- Hanumān came out blue: the style now says reddish-ochre fur, crown and
+  ornaments, "never blue".
+- The model labelled the river "Sarayū" though told not to: places are now
+  described, not named, and the style forbids labels of any kind.
+- The map was a modern outline of India: it is now a faint sketch of rivers,
+  forests and hills with no coastline or borders.
+- The exiles wore palace clothes: bark garments and matted hair are spelled
+  out wherever they are in exile.
+- The ground was a yellower cream than the page: the style asks for #FDFAF3.
+- The SDK in `dharmasastra-gcp/myenv` cannot ask for a size or aspect ratio,
+  so the script calls the REST API, which can (2K, 21:9 for the banner).
+
+Rejected variants worth remembering: one Bāla Kāṇḍa card put Hanumān in
+Janaka's court; one Ayodhyā card left out Lakṣmaṇa. Check each image against
+the story before installing it.
+
+The earlier draft of these prompts follows, for reference.
+
+
 Prompts for placeholder illustrations, to be made with Gemini (or any image
 model) and replaced later by a commissioned artist. Every illustration has a
 slot in `site.config.json` (`portal`), so a new image is a new file plus a
@@ -34,8 +57,9 @@ outlined figures over a faint map, warm colour, a lot of cream ground.
 > browns on a plain cream ground, with generous empty cream space. Figures in
 > traditional Indian dress and ornament of the epic period: dhotī and uttarīya,
 > crowns and earrings for princes, matted hair and bark garments for ascetics
-> and for Rāma, Sītā and Lakṣmaṇa in exile. Faces gentle and dignified, in
-> profile or three-quarter view as in miniatures. Absolutely no text, letters,
+> and for Rāma, Sītā and Lakṣmaṇa in exile. Rāma's skin is dark blue-grey
+> (śyāma), as the miniatures paint him; Lakṣmaṇa's is fair. Faces gentle and
+> dignified, in profile or three-quarter view as in miniatures. Absolutely no text, letters,
 > numbers, captions or signatures anywhere in the image.
 
 ## Banner: `public/images/portal/banner.jpg`

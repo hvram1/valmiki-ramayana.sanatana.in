@@ -2,9 +2,8 @@
 import Base from '../layouts/Base.astro';
 import Divider from '../components/Divider.astro';
 import { KANDAS, sarga } from '../lib/data';
-import { SITE, href, kandaHref, verseHref, deva } from '../lib/site';
+import { SITE, href, kandaHref, verseHref, deva, ART, art } from '../lib/site';
 
-const P = SITE.portal;
 const verseOf = (k: number, s: number, v: number) => sarga(k, s).verses.find((x) => x.n === v)!.text;
 const halves = (t: string) => t.split(/\s*[|।]\s*/);
 const maNishada = halves(verseOf(1, 2, 15));
@@ -19,7 +18,7 @@ const KANDA_EN: Record<number, [string, string]> = {
   5: ['Sundara Kāṇḍa', 'Hanumān’s leap over the ocean, Sītā in the Aśoka grove, and Laṅkā set on fire.'],
   6: ['Yuddha Kāṇḍa', 'The bridge, the war, Rāvaṇa’s fall, Sītā’s ordeal and the return to Ayodhyā.'],
 };
-const credit = (slot: string) => P.credits[slot as keyof typeof P.credits];
+const credit = (slot: string) => (ART.credits as Record<string, { title: string; artist: string }>)[slot];
 const features = [
   { icon: 'read', title: 'काण्डानि', en: 'Read the text', href: href('#kandas'), text: `All six kāṇḍas, sarga by sarga: ${sargas} sargas and ${total.toLocaleString('en-IN')} verses, each with a page of its own.` },
   { icon: 'listen', title: 'श्रवणम्', en: 'Listen', href: href('1/1/'), text: `The recitation of ${SITE.reciter}. Each word is lit as it is chanted; play a sarga, one verse, or from any word.` },
@@ -35,7 +34,7 @@ const features = [
     <svg class="hero-arrow" viewBox="0 0 300 20" aria-hidden="true"><g fill="none" stroke="var(--maroon)" stroke-width="2" stroke-linecap="round"><path d="M20 10h250" /><path d="M270 10l-14-7M270 10l-14 7" /><path d="M20 10l-10-6M20 10l-10 6M30 10l-10-6M30 10l-10 6M40 10l-10-6M40 10l-10 6" /></g></svg>
     <p class="mangala">कूजन्तं राम रामेति मधुरं मधुराक्षरम् ।<br />आरुह्य कविताशाखां वन्दे वाल्मीकिकोकिलम् ॥</p>
     <figure class="hero-art">
-      <img src={href(P.banner)} alt={credit('banner')?.title} width="2000" height="1192" fetchpriority="high" />
+      <img src={art(ART.banner.src)} alt={credit('banner')?.title} width={ART.banner.w} height={ART.banner.h} fetchpriority="high" />
       {credit('banner') && <figcaption>{credit('banner').title} · {credit('banner').artist}</figcaption>}
     </figure>
   </section>
@@ -73,9 +72,9 @@ const features = [
         verses differently.
       </p>
     </div>
-    {P.intro && (
+    {ART.intro && (
       <figure class="intro-art">
-        <img src={href(P.intro)} alt={credit('intro')?.title} width="1100" height="788" loading="lazy" />
+        <img src={art(ART.intro.src)} alt={credit('intro')?.title} width={ART.intro.w} height={ART.intro.h} loading="lazy" />
         {credit('intro') && <figcaption>{credit('intro').title} · {credit('intro').artist}</figcaption>}
       </figure>
     )}
@@ -87,12 +86,12 @@ const features = [
     <h2 class="section-title">काण्डानि <small>The six kāṇḍas</small></h2>
     <ol class="kanda-grid">
       {KANDAS.map((K) => {
-        const img = P.kandas[String(K.k) as keyof typeof P.kandas];
+        const img = ART.kandas[String(K.k) as keyof typeof ART.kandas];
         const [en, gist] = KANDA_EN[K.k];
         return (
           <li>
             <a class="kanda-card" href={kandaHref(K.k)}>
-              {img && <img src={href(img)} alt="" loading="lazy" width="900" height="600" />}
+              {img && <img src={art(img)} alt="" loading="lazy" width="900" height="600" />}
               <span class="kanda-body">
                 <span class="kanda-num">{deva(K.k)}</span>
                 <span class="kanda-name">{K.name}</span>
@@ -111,7 +110,7 @@ const features = [
     <div class="feature-grid">
       {features.map((f) => (
         <article class="feature">
-          <img src={href(P.icons[f.icon as keyof typeof P.icons])} alt="" width="96" height="96" />
+          <img src={art(ART.icons[f.icon as keyof typeof ART.icons])} alt="" width="96" height="96" />
           <div>
             <h3>
               {f.href ? <a href={f.href}>{f.title} <span class="en">{f.en}</span> <span aria-hidden="true">→</span></a>

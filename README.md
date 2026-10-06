@@ -47,3 +47,26 @@ seeks within it by the aligned times.
     npm install
     npm run dev       # http://localhost:4321/valmiki-ramayana.sanatana.in/
     npm run build && npm run preview
+
+## Illustrations: two sets, one switch
+
+`art.set` in `site.config.json` chooses the illustrations, and `ART_SET` in the
+environment overrides it for one build:
+
+    ART_SET=generated npm run build     # Gemini placeholders
+    ART_SET=commons npm run build       # public-domain paintings (default)
+
+Each set lives in `public/images/art/<set>/` (banner, introduction, emblem,
+six kāṇḍa cards, six feature icons) and has its own entries and credits under
+`art.sets` in the config; the credits page follows the set.
+
+- **commons**: paintings from Wikimedia Commons, public domain or CC0, chosen
+  from the gallery at https://claude.ai/artifact/1RkYLLpdQ6QT2ERjpmYrR4.
+- **generated**: placeholders made with Gemini until an artist is commissioned.
+  The prompts are in `scripts/generate_art.py` and double as the artist's
+  brief. To make more variants and install the ones you choose:
+
+      ../dharmasastra-gcp/myenv/bin/python scripts/generate_art.py art-variants/generated banner kanda-3 -n 3
+      ../dharmasastra-gcp/myenv/bin/python scripts/generate_art.py --install art-variants/generated banner=3 kanda-3=2
+
+  `art-variants/` holds every variant made so far and is not committed.

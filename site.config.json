@@ -8,74 +8,167 @@
   "repo": "hvram1/valmiki-ramayana.sanatana.in",
   "reciter": "Sriram Harisitaramamurti Ghanapāṭhī",
   "recording": "https://archive.org/details/Ramayana-recitation-Sriram-harisItArAmamUrti-Ghanapaati-v2",
-  "portal": {
-    "_note": "Every image is a slot: replace the file, or point the slot at another, and update its credit.",
-    "banner": "images/portal/banner.jpg",
-    "intro": "images/portal/intro.jpg",
-    "kandas": {
-      "1": "images/portal/kanda-1.jpg",
-      "2": "images/portal/kanda-2.jpg",
-      "3": "images/portal/kanda-3.jpg",
-      "4": "images/portal/kanda-4.jpg",
-      "5": "images/portal/kanda-5.jpg",
-      "6": "images/portal/kanda-6.jpg"
-    },
-    "icons": {
-      "read": "images/icons/read.svg",
-      "listen": "images/icons/listen.svg",
-      "search": "images/icons/search.svg",
-      "commentary": "images/icons/commentary.svg",
-      "characters": "images/icons/characters.svg",
-      "places": "images/icons/places.svg"
-    },
-    "credits": {
-      "banner": {
-        "title": "Hanuman flies to the Himalayas in search of sacred herbs, From the Mewar Ramayana",
-        "artist": "Sahibdin",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:Hanuman_flies_to_the_Himalayas_in_search_of_sacred_herbs,_From_the_Mewar_Ramayana.jpg"
+  "art": {
+    "_note": "set picks the illustrations: 'commons' (public-domain paintings) or 'generated' (Gemini placeholders). ART_SET in the environment overrides it for one build. Paths are under public/images/art/<set>/.",
+    "set": "commons",
+    "sets": {
+      "commons": {
+        "emblem": "emblem.svg",
+        "banner": {
+          "src": "banner.jpg",
+          "w": 2000,
+          "h": 1192
+        },
+        "intro": {
+          "src": "intro.jpg",
+          "w": 1100,
+          "h": 788
+        },
+        "kandas": {
+          "1": "kanda-1.jpg",
+          "2": "kanda-2.jpg",
+          "3": "kanda-3.jpg",
+          "4": "kanda-4.jpg",
+          "5": "kanda-5.jpg",
+          "6": "kanda-6.jpg"
+        },
+        "icons": {
+          "read": "icons/read.svg",
+          "listen": "icons/listen.svg",
+          "search": "icons/search.svg",
+          "commentary": "icons/commentary.svg",
+          "characters": "icons/characters.svg",
+          "places": "icons/places.svg"
+        },
+        "credits": {
+          "banner": {
+            "title": "Rāma’s journey, Hanumān and Vālmīki (trial)",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "intro": {
+            "title": "Narada visits Valmiki",
+            "artist": "Anonymous (Indian)",
+            "license": "Public domain",
+            "source": "https://commons.wikimedia.org/wiki/File:Narada_visits_Valmiki.jpg"
+          },
+          "kanda-1": {
+            "title": "The Sage Vishvamitra Requests from King Dasharatha the Assistance of His Son Rama",
+            "artist": "Workshop active in the First generation after Nainsukh",
+            "license": "Public domain",
+            "source": "https://commons.wikimedia.org/wiki/File:The_Sage_Vishvamitra_Requests_from_King_Dasharatha_the_Assistance_of_His_Son_Rama.jpg"
+          },
+          "kanda-2": {
+            "title": "Rama, Sita and Lakshmana Cross the Ganga, Folio from a Ramayana series",
+            "artist": "Painter from the First Generation after Nainsukh",
+            "license": "Public domain",
+            "source": "https://commons.wikimedia.org/wiki/File:Rama,_Sita_and_Lakshmana_Cross_the_Ganga,_Folio_from_a_Ramayana_series.jpg"
+          },
+          "kanda-3": {
+            "title": "Anonymous - Rama and Lakshmana Search in Vain for Sita, Illustrated folio from a dispersed Ramayana series - 1974.148 - Metropolitan Museum of Art",
+            "artist": "anonymous",
+            "license": "Public domain",
+            "source": "https://commons.wikimedia.org/wiki/File:Anonymous_-_Rama_and_Lakshmana_Search_in_Vain_for_Sita,_Illustrated_folio_from_a_dispersed_Ramayana_series_-_1974.148_-_Metropolitan_Museum_of_Art.jpg"
+          },
+          "kanda-4": {
+            "title": "Rama and Lakshmana arrive at Lake Pampa, From the Mewar Ramayana",
+            "artist": "Unknown",
+            "license": "Public domain",
+            "source": "https://commons.wikimedia.org/wiki/File:Rama_and_Lakshmana_arrive_at_Lake_Pampa,_From_the_Mewar_Ramayana.jpg"
+          },
+          "kanda-5": {
+            "title": "Sita accepting a jewel from Hanumana sent by Rama, 1800s",
+            "artist": "Original uploader was Sridhar1000 at te.wikipedia",
+            "license": "Public domain",
+            "source": "https://commons.wikimedia.org/wiki/File:Sita_accepting_a_jewel_from_Hanumana_sent_by_Rama,_1800s.jpg"
+          },
+          "kanda-6": {
+            "title": "The Monkey Leader Angada Steals Ravana's Crown from His Fortress MET DP227582",
+            "artist": "Manaku",
+            "license": "CC0",
+            "source": "https://commons.wikimedia.org/wiki/File:The_Monkey_Leader_Angada_Steals_Ravana%27s_Crown_from_His_Fortress_MET_DP227582.jpg"
+          }
+        }
       },
-      "intro": {
-        "title": "Narada visits Valmiki",
-        "artist": "Anonymous (Indian)",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:Narada_visits_Valmiki.jpg"
-      },
-      "kanda-1": {
-        "title": "The Sage Vishvamitra Requests from King Dasharatha the Assistance of His Son Rama",
-        "artist": "Workshop active in the First generation after Nainsukh",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:The_Sage_Vishvamitra_Requests_from_King_Dasharatha_the_Assistance_of_His_Son_Rama.jpg"
-      },
-      "kanda-2": {
-        "title": "Rama, Sita and Lakshmana Cross the Ganga, Folio from a Ramayana series",
-        "artist": "Painter from the First Generation after Nainsukh",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:Rama,_Sita_and_Lakshmana_Cross_the_Ganga,_Folio_from_a_Ramayana_series.jpg"
-      },
-      "kanda-3": {
-        "title": "Anonymous - Rama and Lakshmana Search in Vain for Sita, Illustrated folio from a dispersed Ramayana series - 1974.148 - Metropolitan Museum of Art",
-        "artist": "anonymous",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:Anonymous_-_Rama_and_Lakshmana_Search_in_Vain_for_Sita,_Illustrated_folio_from_a_dispersed_Ramayana_series_-_1974.148_-_Metropolitan_Museum_of_Art.jpg"
-      },
-      "kanda-4": {
-        "title": "Rama and Lakshmana arrive at Lake Pampa, From the Mewar Ramayana",
-        "artist": "Unknown",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:Rama_and_Lakshmana_arrive_at_Lake_Pampa,_From_the_Mewar_Ramayana.jpg"
-      },
-      "kanda-5": {
-        "title": "Sita accepting a jewel from Hanumana sent by Rama, 1800s",
-        "artist": "Original uploader was Sridhar1000 at te.wikipedia",
-        "license": "Public domain",
-        "source": "https://commons.wikimedia.org/wiki/File:Sita_accepting_a_jewel_from_Hanumana_sent_by_Rama,_1800s.jpg"
-      },
-      "kanda-6": {
-        "title": "The Monkey Leader Angada Steals Ravana's Crown from His Fortress MET DP227582",
-        "artist": "Manaku",
-        "license": "CC0",
-        "source": "https://commons.wikimedia.org/wiki/File:The_Monkey_Leader_Angada_Steals_Ravana%27s_Crown_from_His_Fortress_MET_DP227582.jpg"
+      "generated": {
+        "emblem": "emblem.png",
+        "banner": {
+          "src": "banner.jpg",
+          "w": 2400,
+          "h": 1018
+        },
+        "intro": {
+          "src": "intro.jpg",
+          "w": 1500,
+          "h": 1120
+        },
+        "kandas": {
+          "1": "kanda-1.jpg",
+          "2": "kanda-2.jpg",
+          "3": "kanda-3.jpg",
+          "4": "kanda-4.jpg",
+          "5": "kanda-5.jpg",
+          "6": "kanda-6.jpg"
+        },
+        "icons": {
+          "read": "icons/read.png",
+          "listen": "icons/listen.png",
+          "search": "icons/search.png",
+          "commentary": "icons/commentary.png",
+          "characters": "icons/characters.png",
+          "places": "icons/places.png"
+        },
+        "credits": {
+          "banner": {
+            "title": "Rāma’s journey from Ayodhyā to Laṅkā, with Hanumān and Vālmīki",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "intro": {
+            "title": "Nārada visits Vālmīki",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "kanda-1": {
+            "title": "Rāma breaks Śiva’s bow",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "kanda-2": {
+            "title": "Rāma, Sītā and Lakṣmaṇa leave Ayodhyā",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "kanda-3": {
+            "title": "The golden deer",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "kanda-4": {
+            "title": "Hanumān meets Rāma and Lakṣmaṇa",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "kanda-5": {
+            "title": "Hanumān gives Rāma’s ring to Sītā",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          },
+          "kanda-6": {
+            "title": "Building the bridge to Laṅkā",
+            "artist": "Generated with Gemini (placeholder)",
+            "license": "",
+            "source": ""
+          }
+        }
       }
     }
   },

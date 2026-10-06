@@ -3,3 +3,4 @@ dist/
 .astro/
 scripts/.ia-meta.json
 __pycache__/
+art-variants/
