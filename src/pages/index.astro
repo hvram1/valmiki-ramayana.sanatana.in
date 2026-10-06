@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { KANDAS } from '../lib/data';
+import { SITE, kandaHref, deva } from '../lib/site';
+const verses = KANDAS.reduce((n, K) => n + K.sargas.reduce((m, S) => m + S.verses, 0), 0);
+---
+<Base title={SITE.name}>
+  <section class="intro">
+    <h1>{SITE.name}</h1>
+    <p class="lede">
+      The Sanskrit text, every verse with its own address, and the recitation of
+      {SITE.reciter}, each word lit as it is chanted.
+    </p>
+  </section>
+  <ol class="cards">
+    {KANDAS.map((K) => (
+      <li>
+        <a class="card" href={kandaHref(K.k)}>
+          <span class="card-title">{K.name}</span>
+          <span class="card-meta">{deva(K.sargas.length)} सर्गाः · {deva(K.sargas.reduce((m, S) => m + S.verses, 0))} श्लोकाः</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+  <p class="note">{KANDAS.length} of 6 kāṇḍas · {verses.toLocaleString('en-IN')} verses so far.</p>
+</Base>

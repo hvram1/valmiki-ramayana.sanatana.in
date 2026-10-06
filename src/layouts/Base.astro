@@ -1,0 +1,54 @@
+---
+import { SITE, href } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+}
+const { title, description = `${SITE.name} — ${SITE.nameRoman}, with the recitation of ${SITE.reciter}`, canonical } = Astro.props;
+const canon = canonical ? new URL(canonical, Astro.site).href : undefined;
+---
+<!doctype html>
+<html lang="sa">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#7a2e12" />
+    {canon && <link rel="canonical" href={canon} />}
+    <title>{title === SITE.name ? title : `${title} · ${SITE.name}`}</title>
+    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href={href()}>
+        <span class="brand-sa">{SITE.name}</span>
+        <span class="brand-en">{SITE.nameRoman}</span>
+      </a>
+      <nav>
+        <a href={href()}>काण्डानि</a>
+        <a href={href('search/')}>अन्वेषणम्</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="foot">
+      <p>
+        Text from valmikiramayan.net (Sanskrit only). Recitation by {SITE.reciter},
+        streamed from <a href={SITE.recording}>archive.org</a>. Word timings are
+        machine-aligned and not yet checked by ear.
+      </p>
+      <p><a href={`https://github.com/${SITE.repo}/issues`}>Report a problem</a></p>
+    </footer>
+    <slot name="after" />
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

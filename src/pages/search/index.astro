@@ -1,0 +1,74 @@
+---
+import Base from '../../layouts/Base.astro';
+import { KANDAS } from '../../lib/data';
+import { href } from '../../lib/site';
+const conf = { files: KANDAS.map((K) => href(`search/k${K.k}.json`)), base: href() };
+---
+<Base title="अन्वेषणम्">
+  <h1>अन्वेषणम् <small>Search</small></h1>
+  <form class="search" role="search" onsubmit="return false">
+    <input id="q" type="search" autocomplete="off" autofocus
+      placeholder="रामो नाम जनैः श्रुतः · ramo nama janaih shrutah · rāmo nāma" aria-label="Search the verses" />
+  </form>
+  <p class="hint" id="status">Type in Devanagari or in Roman letters, with or without diacritics.</p>
+  <ol class="results" id="results"></ol>
+  <script type="application/json" id="search-conf" set:html={JSON.stringify(conf)} />
+</Base>
+
+<script>
+  type Row = [number, number, number, string, string];
+  const conf = JSON.parse(document.getElementById('search-conf')!.textContent!);
+  const q = document.getElementById('q') as HTMLInputElement;
+  const status = document.getElementById('status')!;
+  const results = document.getElementById('results')!;
+
+  // One fold for the index and the query, so ITRANS, IAST and loose spelling
+  // meet: diacritics off, aspiration and sibilants merged, doubled letters
+  // collapsed, vowel length ignored.
+  function fold(s: string): string {
+    return s
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+      .replace(/[^a-z]/g, '')
+      .replace(/chh|ch|c/g, 'c').replace(/sh|s/g, 's')
+      .replace(/([kgcjtdpb])h/g, '$1')
+      .replace(/jny|jn|gy|dny/g, 'jn')
+      .replace(/w/g, 'v').replace(/ee/g, 'i').replace(/oo/g, 'u')
+      .replace(/ri/g, 'r')
+      .replace(/(.)\1+/g, '$1');
+  }
+  const devaFold = (s: string) => s.replace(/[\s|।॥ऽ\-]/g, '');
+  const isDeva = (s: string) => /[ऀ-ॿ]/.test(s);
+
+  let rows: (Row & { f?: string; d?: string })[] = [];
+  let index: { row: Row; f: string; d: string }[] = [];
+
+  Promise.all(conf.files.map((f: string) => fetch(f).then((r) => r.json()))).then((parts) => {
+    rows = parts.flat();
+    index = rows.map((row) => ({ row, f: fold(row[4]), d: devaFold(row[3]) }));
+    status.textContent = `${index.length.toLocaleString('en-IN')} verses. Type in Devanagari or in Roman letters, with or without diacritics.`;
+    const p = new URLSearchParams(location.search).get('q');
+    if (p) { q.value = p; run(); }
+  });
+
+  const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  function run() {
+    const raw = q.value.trim();
+    history.replaceState(null, '', raw ? `?q=${encodeURIComponent(raw)}` : location.pathname);
+    results.innerHTML = '';
+    if (!raw) return;
+    const deva = isDeva(raw);
+    let needle = deva ? devaFold(raw) : fold(raw);
+    // A typed stem ends in its inherent 'a' (dasharatha); the text inflects
+    // it (dasharatho, dasharathena). Devanagari stems have no such vowel.
+    if (!deva && needle.length > 3) needle = needle.replace(/a$/, '');
+    if (needle.length < 2) return;
+    const hits = index.filter((x) => (deva ? x.d : x.f).includes(needle));
+    status.textContent = hits.length ? `${hits.length} verse${hits.length > 1 ? 's' : ''}${hits.length > 200 ? ', the first 200 shown' : ''}` : 'Nothing found';
+    results.innerHTML = hits.slice(0, 200).map(({ row: [k, s, v, text] }) =>
+      `<li><a href="${conf.base}${k}/${s}/${v}/"><span class="vnum">${k}.${s}.${v}</span> <span class="rtext">${esc(text).replace(/ \| /g, ' । ')}</span></a></li>`
+    ).join('');
+  }
+  let timer: number | undefined;
+  q.addEventListener('input', () => { clearTimeout(timer); timer = window.setTimeout(run, 150); });
+</script>

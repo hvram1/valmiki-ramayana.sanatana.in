@@ -1,0 +1,26 @@
+---
+// The content address. One place: that verse, canonical to its readable
+// address. Several (the same text twice): a list of the places.
+import Base from '../../layouts/Base.astro';
+import VersePage from '../../components/VersePage.astro';
+import { CIDS, sarga } from '../../lib/data';
+import { verseHref } from '../../lib/site';
+
+export function getStaticPaths() {
+  return Object.keys(CIDS).map((cid) => ({ params: { cid } }));
+}
+const { cid } = Astro.params as { cid: string };
+const places = CIDS[cid];
+const [k, s, v] = places[0];
+const text = sarga(k, s).verses.find((x) => x.n === v)!.text;
+---
+{places.length === 1 ? (
+  <VersePage k={k} s={s} v={v} canonical={verseHref(k, s, v)} />
+) : (
+  <Base title={`#${cid}`}>
+    <h1><code>#{cid}</code></h1>
+    <p class="vtext">{text}</p>
+    <p>This verse occurs in {places.length} places:</p>
+    <ul>{places.map(([a, b, c]) => <li><a href={verseHref(a, b, c)}>{a}.{b}.{c}</a></li>)}</ul>
+  </Base>
+)}

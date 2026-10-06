@@ -1,0 +1,15 @@
+{
+  "name": "valmiki-ramayana-site",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "data": "python3 scripts/prepare_data.py",
+    "dev": "astro dev --host",
+    "build": "astro build",
+    "preview": "astro preview --host"
+  },
+  "dependencies": {
+    "astro": "^5.16.15"
+  }
+}

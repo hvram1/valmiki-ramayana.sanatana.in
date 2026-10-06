@@ -1,0 +1,61 @@
+---
+// One verse with its listening bar. Rendered at /k/s/v and at /v/<cid>, the
+// content address, which declares the readable address canonical.
+import Base from '../layouts/Base.astro';
+import Verse from './Verse.astro';
+import Player from './Player.astro';
+import { sarga, CIDS } from '../lib/data';
+import { href, kandaHref, sargaHref, verseHref, cidHref, SITE } from '../lib/site';
+
+interface Props { k: number; s: number; v: number; canonical?: string }
+const { k, s, v, canonical } = Astro.props;
+const S = sarga(k, s);
+const i = S.verses.findIndex((x) => x.n === v);
+const verse = S.verses[i];
+const prev = S.verses[i - 1];
+const next = S.verses[i + 1];
+const elsewhere = (CIDS[verse.cid] || []).filter(([a, b, c]) => !(a === k && b === s && c === v));
+const permalink = new URL(cidHref(verse.cid), Astro.site).href;
+---
+<Base title={`${k}.${s}.${v} ${S.kanda}`} description={verse.text} canonical={canonical}>
+  <nav class="crumbs">
+    <a href={href()}>काण्डानि</a> › <a href={kandaHref(k)}>{S.kanda}</a> ›
+    <a href={`${sargaHref(k, s)}#v${v}`}>{S.name}</a>
+  </nav>
+  <div class="single">
+    <Verse k={k} s={s} verse={verse} link={false} />
+  </div>
+  <dl class="addr">
+    <dt>Address</dt><dd><a href={verseHref(k, s, v)}>{k}.{s}.{v}</a></dd>
+    <dt>Permanent link</dt>
+    <dd>
+      <a href={cidHref(verse.cid)}><code>{permalink}</code></a>
+      <button type="button" class="copy" data-copy={permalink}>copy</button>
+      <div class="sub">A hash of the verse's text, made by shloka_setu. It keeps working if the verses are renumbered.</div>
+    </dd>
+    {elsewhere.length > 0 && <>
+      <dt>Also at</dt>
+      <dd>{elsewhere.map(([a, b, c]) => <a href={verseHref(a, b, c)}>{a}.{b}.{c}</a>)}</dd>
+    </>}
+    <dt>Recitation</dt>
+    <dd><a href={`${sargaHref(k, s)}#v${v}`}>Continue through the sarga from here</a></dd>
+  </dl>
+  <nav class="pager">
+    {prev ? <a href={verseHref(k, s, prev.n)}>‹ {k}.{s}.{prev.n}</a> : <a href={sargaHref(k, s)}>‹ {S.name}</a>}
+    {next ? <a href={verseHref(k, s, next.n)}>{k}.{s}.{next.n} ›</a> : <a href={sargaHref(k, s)}>{S.name} ›</a>}
+  </nav>
+  <Player slot="after" sarga={S} verses={[verse]} stopAtVerseEnd />
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy!);
+        b.textContent = 'copied';
+      } catch {
+        b.textContent = 'press and hold the link to copy';
+      }
+    })
+  );
+</script>

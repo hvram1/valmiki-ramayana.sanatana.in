@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import { KANDAS, type KandaInfo } from '../../lib/data';
+import { href, sargaHref, deva } from '../../lib/site';
+
+export function getStaticPaths() {
+  return KANDAS.map((K) => ({ params: { k: String(K.k) }, props: { K } }));
+}
+const { K } = Astro.props as { K: KandaInfo };
+---
+<Base title={K.name}>
+  <nav class="crumbs"><a href={href()}>काण्डानि</a></nav>
+  <h1>{K.name}</h1>
+  <ol class="sargas">
+    {K.sargas.map((S) => (
+      <li>
+        <a href={sargaHref(K.k, S.s)}>
+          <span class="snum">{deva(S.s)}</span>
+          <span class="sname">{S.name}</span>
+          <span class="scount">{deva(S.verses)}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</Base>

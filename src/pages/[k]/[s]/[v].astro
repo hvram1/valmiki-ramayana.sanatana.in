@@ -1,0 +1,12 @@
+---
+import VersePage from '../../../components/VersePage.astro';
+import { allSargas } from '../../../lib/data';
+
+export function getStaticPaths() {
+  return allSargas().flatMap((S) =>
+    S.verses.map((v) => ({ params: { k: String(S.k), s: String(S.s), v: String(v.n) } }))
+  );
+}
+const { k, s, v } = Astro.params;
+---
+<VersePage k={+k!} s={+s!} v={+v!} />

@@ -1,0 +1,197 @@
+---
+import type { Sarga, Verse } from '../lib/data';
+
+interface Props {
+  sarga: Sarga;
+  verses: Verse[]; // the verses on this page
+  stopAtVerseEnd?: boolean; // a verse page plays one verse and stops
+}
+const { sarga, verses, stopAtVerseEnd = false } = Astro.props;
+const data = {
+  k: sarga.k,
+  s: sarga.s,
+  audio: sarga.audio,
+  duration: sarga.duration,
+  words: sarga.words,
+  verses: verses.map((v) => [v.n, v.t, v.e]),
+  stopAtVerseEnd,
+};
+---
+<script type="application/json" id="player-data" set:html={JSON.stringify(data)} />
+
+<div class="player" id="player" data-idle>
+  <button type="button" class="pbtn play" id="p-play" aria-label="Play">▶</button>
+  <button type="button" class="pbtn" id="p-prev" aria-label="Previous verse">⏮</button>
+  <button type="button" class="pbtn" id="p-next" aria-label="Next verse">⏭</button>
+  <div class="pmid">
+    <div class="plabel" id="p-label">{stopAtVerseEnd ? 'Listen to this verse' : 'Listen to the sarga'}</div>
+    <input type="range" id="p-seek" min="0" max={Math.round(sarga.duration)} step="0.1" value="0" aria-label="Position" />
+  </div>
+  <span class="ptime" id="p-time">0:00</span>
+  <select id="p-rate" aria-label="Speed">
+    <option value="1">1×</option>
+    <option value="0.85">0.85×</option>
+    <option value="0.7">0.7×</option>
+  </select>
+  <label class="pfollow" title="Scroll to the verse being chanted"><input type="checkbox" id="p-follow" checked /> follow</label>
+</div>
+
+<script>
+  type Data = {
+    k: number; s: number; audio: string | null; duration: number;
+    words: [number, number][]; verses: [number, number, number][]; stopAtVerseEnd: boolean;
+  };
+  const data: Data = JSON.parse(document.getElementById('player-data')!.textContent!);
+  const $ = (id: string) => document.getElementById(id)!;
+  const player = $('player');
+  const playBtn = $('p-play') as HTMLButtonElement;
+  const seek = $('p-seek') as HTMLInputElement;
+  const label = $('p-label');
+  const timeEl = $('p-time');
+  const rate = $('p-rate') as HTMLSelectElement;
+  const follow = $('p-follow') as HTMLInputElement;
+
+  const audio = new Audio();
+  audio.preload = 'none';
+  let stopAt: number | null = null;
+  let started = false;
+
+  // Word spans by index into data.words; only those on this page exist.
+  const spans = new Map<number, HTMLElement>();
+  document.querySelectorAll<HTMLElement>('.w[data-w]').forEach((el) => spans.set(+el.dataset.w!, el));
+  const articles = new Map<number, HTMLElement>();
+  document.querySelectorAll<HTMLElement>('article.verse').forEach((el) => articles.set(+el.dataset.n!, el));
+  const starts = data.words.map((w) => w[0]);
+
+  const fmt = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+  function lastAtOrBefore(xs: number[], t: number): number {
+    let lo = 0, hi = xs.length - 1, ans = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (xs[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1;
+    }
+    return ans;
+  }
+
+  function verseAt(t: number): number {
+    // the verse whose span holds t, else the last one begun
+    let cur = -1;
+    for (let i = 0; i < data.verses.length; i++) if (data.verses[i][1] <= t + 0.05) cur = i;
+    return cur;
+  }
+
+  function playFrom(t: number, until: number | null) {
+    if (!data.audio) return;
+    stopAt = until;
+    if (!started) {
+      // A media fragment starts at t on the first gesture; iOS will not
+      // honour a seek made before the media has loaded.
+      audio.src = `${data.audio}#t=${t}`;
+      started = true;
+      audio.addEventListener('loadedmetadata', () => {
+        if (Math.abs(audio.currentTime - t) > 0.5) audio.currentTime = t;
+      }, { once: true });
+    } else {
+      audio.currentTime = t;
+    }
+    audio.playbackRate = +rate.value;
+    audio.play();
+  }
+
+  function toggle() {
+    if (!started) {
+      const v = data.verses[0];
+      playFrom(v[1], data.stopAtVerseEnd ? v[2] : null);
+    } else if (audio.paused) audio.play();
+    else audio.pause();
+  }
+
+  function step(dir: number) {
+    const i = verseAt(started ? audio.currentTime : -1);
+    const j = Math.min(Math.max(i + dir, 0), data.verses.length - 1);
+    const v = data.verses[j];
+    playFrom(v[1], data.stopAtVerseEnd ? v[2] : stopAt === null ? null : v[2]);
+  }
+
+  let lit: HTMLElement | undefined;
+  let litVerse: HTMLElement | undefined;
+  let lastUserScroll = 0;
+  addEventListener('wheel', () => (lastUserScroll = Date.now()), { passive: true });
+  addEventListener('touchmove', () => (lastUserScroll = Date.now()), { passive: true });
+
+  function tick() {
+    const t = audio.currentTime;
+    if (stopAt !== null && t >= stopAt) {
+      audio.pause();
+      stopAt = null;
+    }
+    const wi = lastAtOrBefore(starts, t);
+    const on = wi >= 0 && t <= data.words[wi][1] + 0.4 ? spans.get(wi) : undefined;
+    if (on !== lit) {
+      lit?.classList.remove('on');
+      on?.classList.add('on');
+      lit = on;
+    }
+    const vi = verseAt(t);
+    const art = vi >= 0 ? articles.get(data.verses[vi][0]) : undefined;
+    if (art !== litVerse) {
+      litVerse?.classList.remove('current');
+      art?.classList.add('current');
+      litVerse = art;
+      if (art) label.textContent = `${data.k}.${data.s}.${data.verses[vi][0]}`;
+      if (art && follow.checked && Date.now() - lastUserScroll > 4000) {
+        const r = art.getBoundingClientRect();
+        if (r.top < 60 || r.bottom > innerHeight - player.offsetHeight - 10)
+          art.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+    if (document.activeElement !== seek) seek.value = String(t);
+    timeEl.textContent = fmt(t);
+    if (!audio.paused) requestAnimationFrame(tick);
+  }
+
+  audio.addEventListener('play', () => {
+    player.removeAttribute('data-idle');
+    playBtn.textContent = '⏸';
+    playBtn.setAttribute('aria-label', 'Pause');
+    requestAnimationFrame(tick);
+  });
+  audio.addEventListener('pause', () => {
+    playBtn.textContent = '▶';
+    playBtn.setAttribute('aria-label', 'Play');
+    tick();
+  });
+  audio.addEventListener('waiting', () => player.classList.add('loading'));
+  audio.addEventListener('playing', () => player.classList.remove('loading'));
+  audio.addEventListener('error', () => { label.textContent = 'The recording could not be loaded'; });
+
+  playBtn.addEventListener('click', toggle);
+  $('p-prev').addEventListener('click', () => step(-1));
+  $('p-next').addEventListener('click', () => step(1));
+  rate.addEventListener('change', () => (audio.playbackRate = +rate.value));
+  seek.addEventListener('change', () => playFrom(+seek.value, null));
+
+  document.querySelectorAll<HTMLElement>('[data-play-verse]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const v = data.verses.find((x) => x[0] === +b.dataset.playVerse!);
+      if (v) playFrom(v[1], v[2]);
+    })
+  );
+
+  // Click a word to hear the chant from there; a drag-select is left alone.
+  document.addEventListener('click', (ev) => {
+    const w = (ev.target as HTMLElement).closest<HTMLElement>('.w[data-w]');
+    if (!w || !getSelection()?.isCollapsed) return;
+    playFrom(data.words[+w.dataset.w!][0], data.stopAtVerseEnd ? data.verses[0][2] : null);
+  });
+
+  addEventListener('keydown', (ev) => {
+    if ((ev.target as HTMLElement).closest('input,select,textarea')) return;
+    if (ev.key === ' ') { ev.preventDefault(); toggle(); }
+    else if (ev.key === 'ArrowRight') step(1);
+    else if (ev.key === 'ArrowLeft') step(-1);
+  });
+
+  if (!data.audio) player.hidden = true;
+</script>

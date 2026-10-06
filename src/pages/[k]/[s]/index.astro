@@ -1,0 +1,27 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Verse from '../../../components/Verse.astro';
+import Player from '../../../components/Player.astro';
+import { allSargas, neighbours, type Sarga } from '../../../lib/data';
+import { href, kandaHref, sargaHref } from '../../../lib/site';
+
+export function getStaticPaths() {
+  return allSargas().map((S) => ({ params: { k: String(S.k), s: String(S.s) }, props: { S } }));
+}
+const { S } = Astro.props as { S: Sarga };
+const { prev, next } = neighbours(S.k, S.s);
+---
+<Base title={`${S.kanda} ${S.name}`}>
+  <nav class="crumbs"><a href={href()}>काण्डानि</a> › <a href={kandaHref(S.k)}>{S.kanda}</a></nav>
+  <h1>{S.name} <small>{S.k}.{S.s}</small></h1>
+  <p class="hint">Press ▶ below to listen to the whole sarga, ▶ beside a verse for that verse alone, or a word to hear it from there.</p>
+  <div class="verses">
+    {S.verses.map((v) => <Verse k={S.k} s={S.s} verse={v} />)}
+  </div>
+  {S.colophon && <p class="colophon">{S.colophon.text} ॥</p>}
+  <nav class="pager">
+    {prev ? <a href={sargaHref(prev.k, prev.s)}>‹ {prev.k}.{prev.s}</a> : <span />}
+    {next ? <a href={sargaHref(next.k, next.s)}>{next.k}.{next.s} ›</a> : <span />}
+  </nav>
+  <Player slot="after" sarga={S} verses={S.verses} />
+</Base>
