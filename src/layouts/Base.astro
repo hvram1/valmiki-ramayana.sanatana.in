@@ -9,6 +9,7 @@ interface Props {
 }
 const { title, description = `${SITE.name} — ${SITE.nameRoman}, with the recitation of ${SITE.reciter}`, canonical, wide = false } = Astro.props;
 const canon = canonical ? new URL(canonical, Astro.site).href : undefined;
+const F = SITE.footer;
 const path = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
 ---
 <!doctype html>
@@ -56,21 +57,23 @@ const path = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, 
     </main>
     <footer class="site-foot">
       <div class="foot-top">
-        <p class="foot-about">{SITE.footer.about}</p>
-        <p class="foot-small">
-          Sanskrit text from valmikiramayan.net. Recitation by {SITE.reciter},
-          streamed from <a href={SITE.recording}>archive.org</a>; word timings are
-          machine-aligned and not yet checked by ear. Paintings from Wikimedia
-          Commons, in the public domain (<a href={href('credits/')}>credits</a>).
-        </p>
+        <p class="foot-mission">{F.mission}</p>
+        <ul class="foot-contact">
+          <li><span class="ico" aria-hidden="true">◍</span><a href={F.orgUrl}>{F.orgSite}</a></li>
+          <li><span class="ico" aria-hidden="true">✉</span><a href={`mailto:${F.email}`}>{F.email}</a></li>
+        </ul>
       </div>
-      <nav class="foot-links" aria-label="Footer">
-        <a href={href()}>मुखपृष्ठम्</a>
-        <a href={href('search/')}>अन्वेषणम्</a>
-        <a href={href('credits/')}>Credits</a>
-        <a href={`https://github.com/${SITE.repo}/issues`}>Report a problem</a>
-        {SITE.footer.links.map(([t, u]) => <a href={u}>{t}</a>)}
+      <nav class="foot-links" aria-label="Sanatanasampatti">
+        {F.links.map(([t, u]) => <a href={u}>{t}</a>)}
       </nav>
+      <div class="foot-base">
+        <span>© {new Date().getFullYear()} {F.org}</span>
+        <span>
+          Text: valmikiramayan.net · Recitation: {SITE.reciter}, via <a href={SITE.recording}>archive.org</a> ·
+          Paintings: Wikimedia Commons (<a href={href('credits/')}>credits</a>) ·
+          <a href={`https://github.com/${SITE.repo}/issues`}>Report a problem</a>
+        </span>
+      </div>
     </footer>
     <slot name="after" />
     <script>

@@ -80,11 +80,32 @@
     }
   },
   "footer": {
-    "about": "The Vālmīki Rāmāyaṇa project gives the Sanskrit text, a permanent address for every verse and a traditional recitation, freely and without advertising. Corrections are welcome.",
+    "org": "Sanatanasampatti",
+    "orgUrl": "https://sanatanasampatti.in",
+    "orgSite": "www.sanatanasampatti.in",
+    "email": "secretary@sanatanasampatti.in",
+    "mission": "The divine knowledge and wisdom of our shastras is the only thing eternal, which was and which will remain ever-present in this god's creation. Our endeavours are to preserve this knowledge.",
+    "project": "The Rāmāyaṇa project aims to provide authentic texts of the Vālmīki Rāmāyaṇa in Sanskrit, with its commentaries and its recitation, to preserve our heritage for our future generation. We welcome views from all to make the content authentic and error free. Contribution both financial and resources are welcome. For feedback or information please write to us at :",
     "links": [
       [
-        "sanatana.in",
-        "https://sanatana.in"
+        "Project",
+        "https://sanatanasampatti.in/Projects"
+      ],
+      [
+        "Our Mission",
+        "https://sanatanasampatti.in/Home"
+      ],
+      [
+        "Contribute",
+        "https://sanatanasampatti.in/Donate"
+      ],
+      [
+        "Contact Us",
+        "https://sanatanasampatti.in/Contact"
+      ],
+      [
+        "Feedback",
+        "mailto:secretary@sanatanasampatti.in?subject=V%C4%81lm%C4%ABki%20R%C4%81m%C4%81ya%E1%B9%87a%20feedback"
       ]
     ]
   }
