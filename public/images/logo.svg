@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Emblem: the sun and Rāma's bow">
+  <!-- Placeholder emblem until an artist's is in: the sun of the Ikṣvākus behind the kodaṇḍa. -->
+  <g fill="none" stroke-linecap="round">
+    <g stroke="#e8a317" stroke-width="3">
+      <path d="M60 6v12M60 102v12M6 60h12M102 60h12M21.8 21.8l8.5 8.5M89.7 89.7l8.5 8.5M21.8 98.2l8.5-8.5M89.7 30.3l8.5-8.5"/>
+    </g>
+    <circle cx="60" cy="60" r="38" fill="#f6c343" stroke="#d35a12" stroke-width="3"/>
+    <path d="M38 30c26 8 26 52 0 60" stroke="#7a2e12" stroke-width="5"/>
+    <path d="M38 30 L38 90" stroke="#7a2e12" stroke-width="1.6"/>
+    <path d="M30 60h56" stroke="#7a2e12" stroke-width="3"/>
+    <path d="M86 60l-9-6M86 60l-9 6" stroke="#7a2e12" stroke-width="3"/>
+    <path d="M30 60l-5-4M30 60l-5 4M34 60l-5-4M34 60l-5 4" stroke="#b2321f" stroke-width="2"/>
+  </g>
+</svg>

@@ -1,26 +1,127 @@
 ---
 import Base from '../layouts/Base.astro';
-import { KANDAS } from '../lib/data';
-import { SITE, kandaHref, deva } from '../lib/site';
-const verses = KANDAS.reduce((n, K) => n + K.sargas.reduce((m, S) => m + S.verses, 0), 0);
+import Divider from '../components/Divider.astro';
+import { KANDAS, sarga } from '../lib/data';
+import { SITE, href, kandaHref, verseHref, deva } from '../lib/site';
+
+const P = SITE.portal;
+const verseOf = (k: number, s: number, v: number) => sarga(k, s).verses.find((x) => x.n === v)!.text;
+const halves = (t: string) => t.split(/\s*[|।]\s*/);
+const maNishada = halves(verseOf(1, 2, 15));
+const extent = halves(verseOf(1, 4, 2));
+const total = KANDAS.reduce((n, K) => n + K.sargas.reduce((m, S) => m + S.verses, 0), 0);
+const sargas = KANDAS.reduce((n, K) => n + K.sargas.length, 0);
+const KANDA_EN: Record<number, [string, string]> = {
+  1: ['Bāla Kāṇḍa', 'Rāma’s birth, Viśvāmitra’s journey, the breaking of the bow and the wedding with Sītā.'],
+  2: ['Ayodhyā Kāṇḍa', 'Kaikeyī’s two boons, the exile, Daśaratha’s death, and Bharata who will not reign.'],
+  3: ['Araṇya Kāṇḍa', 'The forest of the sages, Śūrpaṇakhā, the golden deer and the carrying off of Sītā.'],
+  4: ['Kiṣkindhā Kāṇḍa', 'Hanumān, the alliance with Sugrīva, Vālin’s fall and the search sent out in all directions.'],
+  5: ['Sundara Kāṇḍa', 'Hanumān’s leap over the ocean, Sītā in the Aśoka grove, and Laṅkā set on fire.'],
+  6: ['Yuddha Kāṇḍa', 'The bridge, the war, Rāvaṇa’s fall, Sītā’s ordeal and the return to Ayodhyā.'],
+};
+const credit = (slot: string) => P.credits[slot as keyof typeof P.credits];
+const features = [
+  { icon: 'read', title: 'काण्डानि', en: 'Read the text', href: href('#kandas'), text: `All six kāṇḍas, sarga by sarga: ${sargas} sargas and ${total.toLocaleString('en-IN')} verses, each with a page of its own.` },
+  { icon: 'listen', title: 'श्रवणम्', en: 'Listen', href: href('1/1/'), text: `The recitation of ${SITE.reciter}. Each word is lit as it is chanted; play a sarga, one verse, or from any word.` },
+  { icon: 'search', title: 'अन्वेषणम्', en: 'Search', href: href('search/'), text: 'Find a verse from a few words, typed in Devanagari or in Roman letters, with or without diacritics.' },
+  { icon: 'commentary', title: 'तिलकव्याख्या', en: 'Tilaka’s commentary', soon: true, text: 'The commentary Tilaka, verse by verse, joined to the text by its words so that differing verse numbers do not misplace it.' },
+  { icon: 'characters', title: 'पात्राणि', en: 'Characters', soon: true, text: 'Every person in the poem, with the verses where each appears and is named.' },
+  { icon: 'places', title: 'स्थलानि', en: 'Places', soon: true, text: 'Ayodhyā to Laṅkā: the places of the story and the route of the exile, on a map.' },
+];
 ---
-<Base title={SITE.name}>
-  <section class="intro">
-    <h1>{SITE.name}</h1>
-    <p class="lede">
-      The Sanskrit text, every verse with its own address, and the recitation of
-      {SITE.reciter}, each word lit as it is chanted.
-    </p>
+<Base title={SITE.name} wide>
+  <section class="hero">
+    <h1 class="hero-title">{SITE.name}</h1>
+    <svg class="hero-arrow" viewBox="0 0 300 20" aria-hidden="true"><g fill="none" stroke="var(--maroon)" stroke-width="2" stroke-linecap="round"><path d="M20 10h250" /><path d="M270 10l-14-7M270 10l-14 7" /><path d="M20 10l-10-6M20 10l-10 6M30 10l-10-6M30 10l-10 6M40 10l-10-6M40 10l-10 6" /></g></svg>
+    <p class="mangala">कूजन्तं राम रामेति मधुरं मधुराक्षरम् ।<br />आरुह्य कविताशाखां वन्दे वाल्मीकिकोकिलम् ॥</p>
+    <figure class="hero-art">
+      <img src={href(P.banner)} alt={credit('banner')?.title} width="2000" height="1192" fetchpriority="high" />
+      {credit('banner') && <figcaption>{credit('banner').title} · {credit('banner').artist}</figcaption>}
+    </figure>
   </section>
-  <ol class="cards">
-    {KANDAS.map((K) => (
-      <li>
-        <a class="card" href={kandaHref(K.k)}>
-          <span class="card-title">{K.name}</span>
-          <span class="card-meta">{deva(K.sargas.length)} सर्गाः · {deva(K.sargas.reduce((m, S) => m + S.verses, 0))} श्लोकाः</span>
+
+  <section class="intro" id="intro">
+    <div class="intro-text">
+      <p class="dropcap">
+        This portal presents the <em class="term">Śrīmad Vālmīki Rāmāyaṇa</em>, the
+        <em class="term">ādikāvya</em>, in Sanskrit, verse by verse, with the
+        recitation of <em class="name">{SITE.reciter}</em>.
+      </p>
+      <p>
+        The poem opens with <em class="name">Vālmīki</em> asking <em class="name">Nārada</em>
+        whether there was anyone in the world then who was virtuous, valiant, grateful and true
+        to his word. Nārada answers with the story of <em class="name">Rāma</em>
+        (<a href={verseHref(1, 1, 1)}>1.1</a>). Soon after, on the bank of the Tamasā, Vālmīki
+        sees a hunter shoot one of a pair of krauñca birds, and his grief comes out as a verse:
+      </p>
+      <blockquote class="shloka">
+        <a href={verseHref(1, 2, 15)}>
+          <span class="sa">{maNishada[0]} ।<br />{maNishada[1]} ॥</span>
+          <span class="where">Bāla Kāṇḍa 2.15</span>
         </a>
-      </li>
-    ))}
-  </ol>
-  <p class="note">{KANDAS.length} of 6 kāṇḍas · {verses.toLocaleString('en-IN')} verses so far.</p>
+      </blockquote>
+      <p>
+        Brahmā tells him to sing the whole of Rāma’s story in that metre. The poem counts itself
+        at twenty-four thousand verses in five hundred sargas, six kāṇḍas and the Uttara
+        (<a href={verseHref(1, 4, 2)}>1.4.2</a>), and Vālmīki teaches it to
+        <em class="name">Kuśa</em> and <em class="name">Lava</em>, who sing it before Rāma himself.
+        This edition gives the six kāṇḍas: {deva(sargas)} सर्गाः, {deva(total)} श्लोकाः.
+      </p>
+      <p>
+        Every verse has two addresses: a readable one, kāṇḍa, sarga and verse, and a permanent one
+        made from the words of the verse, which keeps working when a later edition numbers the
+        verses differently.
+      </p>
+    </div>
+    {P.intro && (
+      <figure class="intro-art">
+        <img src={href(P.intro)} alt={credit('intro')?.title} width="1100" height="788" loading="lazy" />
+        {credit('intro') && <figcaption>{credit('intro').title} · {credit('intro').artist}</figcaption>}
+      </figure>
+    )}
+  </section>
+
+  <Divider />
+
+  <section class="kandas" id="kandas">
+    <h2 class="section-title">काण्डानि <small>The six kāṇḍas</small></h2>
+    <ol class="kanda-grid">
+      {KANDAS.map((K) => {
+        const img = P.kandas[String(K.k) as keyof typeof P.kandas];
+        const [en, gist] = KANDA_EN[K.k];
+        return (
+          <li>
+            <a class="kanda-card" href={kandaHref(K.k)}>
+              {img && <img src={href(img)} alt="" loading="lazy" width="900" height="600" />}
+              <span class="kanda-body">
+                <span class="kanda-num">{deva(K.k)}</span>
+                <span class="kanda-name">{K.name}</span>
+                <span class="kanda-en">{en}</span>
+                <span class="kanda-gist">{gist}</span>
+                <span class="kanda-count">{deva(K.sargas.length)} सर्गाः · {deva(K.sargas.reduce((m, S) => m + S.verses, 0))} श्लोकाः</span>
+              </span>
+            </a>
+          </li>
+        );
+      })}
+    </ol>
+  </section>
+
+  <section class="features">
+    <div class="feature-grid">
+      {features.map((f) => (
+        <article class="feature">
+          <img src={href(P.icons[f.icon as keyof typeof P.icons])} alt="" width="96" height="96" />
+          <div>
+            <h3>
+              {f.href ? <a href={f.href}>{f.title} <span class="en">{f.en}</span> <span aria-hidden="true">→</span></a>
+                      : <>{f.title} <span class="en">{f.en}</span></>}
+              {f.soon && <span class="soon">coming</span>}
+            </h3>
+            <p>{f.text}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
 </Base>

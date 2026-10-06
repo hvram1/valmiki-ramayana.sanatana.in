@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE, href } from '../../lib/site';
+const C = SITE.portal.credits as Record<string, { title: string; artist: string; license: string; source: string }>;
+const where: Record<string, string> = { banner: 'Banner', intro: 'Introduction' };
+---
+<Base title="Credits">
+  <h1>Credits</h1>
+  <p>The paintings on this site are in the public domain or released under CC0, and come from Wikimedia Commons. The holding museum and the full licence statement are on each painting’s Commons page.</p>
+  <ul class="credits">
+    {Object.entries(C).map(([slot, c]) => (
+      <li>
+        <strong>{where[slot] ?? `Kāṇḍa ${slot.replace('kanda-', '')}`}</strong>:
+        <a href={c.source}>{c.title}</a>. {c.artist}. {c.license}.
+      </li>
+    ))}
+  </ul>
+  <p>The Sanskrit text is from <a href="https://www.valmikiramayan.net/">valmikiramayan.net</a>. The recitation by {SITE.reciter} is on <a href={SITE.recording}>archive.org</a>. The fonts are Siddhanta, EB Garamond and Noto Serif Devanagari.</p>
+  <p><a href={href()}>‹ मुखपृष्ठम्</a></p>
+</Base>

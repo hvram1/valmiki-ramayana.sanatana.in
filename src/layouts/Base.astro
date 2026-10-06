@@ -5,9 +5,11 @@ interface Props {
   title: string;
   description?: string;
   canonical?: string;
+  wide?: boolean; // the portal runs wider than a reading page
 }
-const { title, description = `${SITE.name} — ${SITE.nameRoman}, with the recitation of ${SITE.reciter}`, canonical } = Astro.props;
+const { title, description = `${SITE.name} — ${SITE.nameRoman}, with the recitation of ${SITE.reciter}`, canonical, wide = false } = Astro.props;
 const canon = canonical ? new URL(canonical, Astro.site).href : undefined;
+const path = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
 ---
 <!doctype html>
 <html lang="sa">
@@ -15,37 +17,82 @@ const canon = canonical ? new URL(canonical, Astro.site).href : undefined;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#7a2e12" />
+    <meta name="theme-color" content="#fffdf8" />
     {canon && <link rel="canonical" href={canon} />}
     <title>{title === SITE.name ? title : `${title} · ${SITE.name}`}</title>
-    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={href('images/logo.svg')} type="image/svg+xml" />
+    <link rel="preload" href={href('fonts/siddhanta.ttf')} as="font" type="font/ttf" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+    <style set:html={`@font-face{font-family:'Siddhanta';src:url('${href('fonts/siddhanta.ttf')}') format('truetype');font-display:swap;}`}></style>
   </head>
   <body>
-    <header class="top">
-      <a class="brand" href={href()}>
-        <span class="brand-sa">{SITE.name}</span>
-        <span class="brand-en">{SITE.nameRoman}</span>
-      </a>
-      <nav>
-        <a href={href()}>काण्डानि</a>
-        <a href={href('search/')}>अन्वेषणम्</a>
-      </nav>
+    <header class="masthead">
+      <div class="mast-inner">
+        <a class="brand" href={href()}>
+          <img src={href('images/logo.svg')} alt="" width="44" height="44" />
+          <span class="brand-sa">{SITE.short}</span>
+        </a>
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="menu-body"><span></span><span></span><span></span></button>
+        <div class="menu-body" id="menu-body">
+            <nav class="menu-links">
+              <a href={href('#intro')} aria-current={path === '/' ? 'page' : undefined}>परिचयः</a>
+              <a href={href('#kandas')} aria-current={/^\/\d/.test(path) ? 'page' : undefined}>काण्डानि</a>
+              <a href={href('1/1/')}>श्रवणम्</a>
+              <a href={href('search/')} aria-current={path.startsWith('/search') ? 'page' : undefined}>अन्वेषणम्</a>
+            </nav>
+            <form class="jump" id="jump" aria-label="Go to a verse">
+              <input id="jump-k" inputmode="numeric" placeholder="काण्डः" aria-label="Kāṇḍa" maxlength="1" />
+              <input id="jump-s" inputmode="numeric" placeholder="सर्गः" aria-label="Sarga" maxlength="3" />
+              <input id="jump-v" inputmode="numeric" placeholder="श्लोकः" aria-label="Verse" maxlength="3" />
+              <button type="submit" aria-label="Go">→</button>
+            </form>
+        </div>
+      </div>
     </header>
-    <main>
+    <main class:list={[{ wide }]}>
       <slot />
     </main>
-    <footer class="foot">
-      <p>
-        Text from valmikiramayan.net (Sanskrit only). Recitation by {SITE.reciter},
-        streamed from <a href={SITE.recording}>archive.org</a>. Word timings are
-        machine-aligned and not yet checked by ear.
-      </p>
-      <p><a href={`https://github.com/${SITE.repo}/issues`}>Report a problem</a></p>
+    <footer class="site-foot">
+      <div class="foot-top">
+        <p class="foot-about">{SITE.footer.about}</p>
+        <p class="foot-small">
+          Sanskrit text from valmikiramayan.net. Recitation by {SITE.reciter},
+          streamed from <a href={SITE.recording}>archive.org</a>; word timings are
+          machine-aligned and not yet checked by ear. Paintings from Wikimedia
+          Commons, in the public domain (<a href={href('credits/')}>credits</a>).
+        </p>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href={href()}>मुखपृष्ठम्</a>
+        <a href={href('search/')}>अन्वेषणम्</a>
+        <a href={href('credits/')}>Credits</a>
+        <a href={`https://github.com/${SITE.repo}/issues`}>Report a problem</a>
+        {SITE.footer.links.map(([t, u]) => <a href={u}>{t}</a>)}
+      </nav>
     </footer>
     <slot name="after" />
+    <script>
+      const toggle = document.getElementById('menu-toggle')!;
+      toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        document.getElementById('menu-body')!.classList.toggle('open', open);
+      });
+      // Go straight to a kāṇḍa, sarga or verse: as many numbers as are given.
+      const f = document.getElementById('jump') as HTMLFormElement;
+      f.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const DEV = '०१२३४५६७८९';
+        const n = (id: string) =>
+          (document.getElementById(id) as HTMLInputElement).value.trim().replace(/[०-९]/g, (d) => String(DEV.indexOf(d)));
+        const parts = [n('jump-k'), n('jump-s'), n('jump-v')].filter((x) => /^\d+$/.test(x));
+        if (!parts.length) return;
+        const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+        location.href = `${base}/${parts.map(Number).join('/')}/`;
+      });
+    </script>
   </body>
 </html>
 
