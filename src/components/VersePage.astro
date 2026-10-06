@@ -23,8 +23,20 @@ const permalink = new URL(cidHref(verse.cid), Astro.site).href;
     <a href={`${sargaHref(k, s)}#v${v}`}>{S.name}</a>
   </nav>
   <div class="single">
-    <Verse k={k} s={s} verse={verse} link={false} />
+    <Verse k={k} s={s} verse={verse} link={false} commentary={false} />
   </div>
+  <section class="tilaka" id="tilaka">
+    <h2>तिलकव्याख्या <small>Tilaka's commentary</small></h2>
+    {verse.tilaka ? (
+      verse.tilaka.split(/\n\s*\n/).filter(Boolean).map((p) => <p>{p}</p>)
+    ) : (
+      <p class="pending">
+        Not yet added. It will appear here when the edition with Tilaka's
+        commentary comes in. It is joined to this verse by its text, so the
+        edition's different verse numbers will not misplace it.
+      </p>
+    )}
+  </section>
   <dl class="addr">
     <dt>Address</dt><dd><a href={verseHref(k, s, v)}>{k}.{s}.{v}</a></dd>
     <dt>Permanent link</dt>

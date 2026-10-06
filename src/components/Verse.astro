@@ -7,8 +7,10 @@ interface Props {
   s: number;
   verse: Verse;
   link?: boolean; // link the number to the verse's own page
+  commentary?: boolean; // show Tilaka collapsed under the verse, when there is one
 }
-const { k, s, verse, link = true } = Astro.props;
+const { k, s, verse, link = true, commentary = true } = Astro.props;
+const paras = (verse.tilaka ?? '').split(/\n\s*\n/).filter(Boolean);
 
 // Halves split at '|'; each token is a word lit by the player, or plain text.
 const uvacha = verse.toks.slice(0, verse.u ?? 0);
@@ -41,4 +43,10 @@ const uncertain = verse.score < 0.4;
     <a class="vcid" href={cidHref(verse.cid)} title="Content address: stays the same if the verses are renumbered">#{verse.cid}</a>
     {uncertain && <span class="unsure" title={`Alignment score ${verse.score}`}>timing uncertain</span>}
   </div>
+  {commentary && paras.length > 0 && (
+    <details class="tilaka-inline">
+      <summary>तिलकव्याख्या</summary>
+      {paras.map((p) => <p>{p}</p>)}
+    </details>
+  )}
 </article>

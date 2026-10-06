@@ -13,6 +13,7 @@ export interface Verse {
   t: number;
   e: number;
   score: number;
+  tilaka: string | null; // Tilaka's commentary, joined by content id; null until it arrives
 }
 
 export interface Sarga {

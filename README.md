@@ -32,6 +32,12 @@ For the custom domain also add `public/CNAME` containing the domain.
 `public/search/`. The output is committed, so the site builds anywhere. It
 prints `PROBLEM` lines and exits non-zero if a verse or word fails to line up.
 
+Tilaka's commentary has a slot on every verse page and is empty until
+`../valmiki-ramayana/tilaka/K0n.json` exists (`[{"text": verse, "tilaka":
+commentary}]`, paragraphs split by a blank line). It is joined by content id,
+never by number, as that edition numbers verses its own way; the data step
+counts and lists the verses that do not join.
+
 The audio is not hosted here: each sarga streams from the archive.org item
 `Ramayana-recitation-Sriram-harisItArAmamUrti-Ghanapaati-v2`, and the player
 seeks within it by the aligned times.

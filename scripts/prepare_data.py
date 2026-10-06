@@ -7,6 +7,13 @@ Reads (paths are flags; the defaults are the sibling checkouts):
   ../audio-ingest/build/aligned/vr-k.s.json    verse and word times
   ../sharadapeetham/shloka_setu                the content address
   archive.org metadata for the recording       file name of each sarga's mp3
+  ../valmiki-ramayana/tilaka/K0n.json          Tilaka's commentary, optional:
+                                               [{"text": verse, "tilaka": comm}]
+
+Tilaka's edition numbers its verses its own way, so the commentary is joined
+by text, never by number: a verse gets the commentary whose verse text has
+the same content id. Give the verse without its speaker line. What does not
+join is counted and listed, not forced.
 
 Writes, all committed so the site builds anywhere without the siblings:
   src/data/kandas.json         kāṇḍa and sarga names, verse counts
@@ -85,6 +92,17 @@ def load_text(xml_dir, k):
     return kanda.get('name'), sargas
 
 
+def load_tilaka(directory, k):
+    """content id -> (verse text, commentary) for one kāṇḍa; {} if none yet."""
+    path = os.path.join(directory, 'K%02d.json' % k)
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    for row in json.load(open(path)):
+        out[content_id(row['text'])] = (row['text'], row['tilaka'])
+    return out
+
+
 def ia_files(cache):
     if os.path.exists(cache):
         meta = json.load(open(cache))
@@ -102,6 +120,8 @@ def main():
     ap.add_argument('--xml', default=os.path.join(PROJECTS, 'valmiki-ramayana', 'xml'))
     ap.add_argument('--aligned', default=os.path.join(PROJECTS, 'audio-ingest', 'build', 'aligned'))
     ap.add_argument('--shloka-setu', default=os.path.join(PROJECTS, 'sharadapeetham'))
+    ap.add_argument('--tilaka', default=os.path.join(PROJECTS, 'valmiki-ramayana', 'tilaka'),
+                    help='directory of K0n.json; a missing file leaves the slot empty')
     args = ap.parse_args()
     sys.path.insert(0, args.shloka_setu)
 
@@ -124,6 +144,8 @@ def main():
     problems = []
     for k in sorted(ks):
         kname, sargas = load_text(args.xml, k)
+        tilaka = load_tilaka(args.tilaka, k)
+        joined = set()
         os.makedirs(os.path.join(data, 'k%d' % k), exist_ok=True)
         search = []
         listing = []
@@ -155,10 +177,13 @@ def main():
                     verse_only = verse_only[len(v['uvacha']):].strip()
                 cid = content_id(verse_only)
                 cids.setdefault(cid, []).append([k, s, v['n']])
+                if cid in tilaka:
+                    joined.add(cid)
                 roman = ' '.join(words[t[1]]['r'] for t in toks if t[1] is not None)
                 verses.append({'n': v['n'], 'cid': cid, 'text': v['text'], 'toks': toks,
                                'u': len(v['uvacha'].split()) if v['uvacha'] else 0,
-                               't': u['t'], 'e': u['e'], 'score': u['score']})
+                               't': u['t'], 'e': u['e'], 'score': u['score'],
+                               'tilaka': tilaka[cid][1] if cid in tilaka else None})
                 search.append([k, s, v['n'], v['text'], roman])
 
             col = next((u for u in al['verses'] if u['kind'] == 'colophon'), None)
@@ -179,6 +204,12 @@ def main():
         with open(os.path.join(SITE, 'public', 'search', 'k%d.json' % k), 'w') as f:
             json.dump(search, f, ensure_ascii=False, separators=(',', ':'))
         print('K%d %s: %d sargas, %d verses' % (k, kname, len(listing), len(search)))
+        if tilaka:
+            left = [tilaka[c][0][:60] for c in tilaka if c not in joined]
+            print('  Tilaka: %d of %d verses joined; %d of its verses found no match'
+                  % (len(joined), len(search), len(left)))
+            for t in left[:10]:
+                print('    unjoined:', t)
 
     # in reading order, so a rerun writes the same file
     cids = dict(sorted(((c, sorted(ps)) for c, ps in cids.items() if ps), key=lambda kv: kv[1][0]))

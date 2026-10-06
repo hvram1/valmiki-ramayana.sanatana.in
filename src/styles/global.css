@@ -116,3 +116,12 @@ main { max-width: 52rem; margin: 0 auto; padding: 0 16px; }
 .results a:hover { background: var(--paper); text-decoration: none; }
 .results .vnum { color: var(--accent); font-size: 0.85rem; margin-right: 6px; }
 .rtext { font-size: 1.1rem; }
+
+.tilaka { margin: 28px 0 8px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
+.tilaka h2 { font-family: var(--deva); font-size: 1.15rem; font-weight: 600; margin: 0 0 8px; }
+.tilaka h2 small { font-family: var(--roman); font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 0.4em; }
+.tilaka p, .tilaka-inline p { font-family: var(--deva); font-size: 1.08rem; line-height: 1.8; margin: 0 0 0.8em; }
+.tilaka p.pending { font-family: var(--roman); color: var(--muted); font-size: 0.9rem; line-height: 1.55; margin: 0; }
+.tilaka-inline { margin-top: 6px; }
+.tilaka-inline summary { cursor: pointer; color: var(--accent); font-family: var(--deva); font-size: 0.95rem; }
+.tilaka-inline[open] { padding-bottom: 4px; }
